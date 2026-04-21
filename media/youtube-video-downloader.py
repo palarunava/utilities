@@ -1,0 +1,157 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "gpuType": "T4",
+      "authorship_tag": "ABX9TyPDnXRzCw3QY8jS1ftyI/yl",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    },
+    "accelerator": "GPU"
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/palarunava/utilities/blob/main/media/youtube-video-downloader.py\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!git clone https://github.com/QwenLM/Qwen3-VL.git\n",
+        "!mkdir qwen_vl_utils\n",
+        "!mv Qwen3-VL/qwen-vl-utils/src/qwen_vl_utils/vision_process.py qwen_vl_utils/\n",
+        "!rm -rf Qwen3-VL"
+      ],
+      "metadata": {
+        "id": "WoQO5XUmjCW4"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!git clone https://github.com/QwenLM/Qwen3-VL-Embedding.git\n",
+        "!mkdir models\n",
+        "!mv Qwen3-VL-Embedding/src/models/* models/\n",
+        "!rm -rf Qwen3-VL-Embedding"
+      ],
+      "metadata": {
+        "id": "xECOW7FLihnG"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# !uv pip install huggingface-hub\n",
+        "\n",
+        "# !huggingface-cli download Qwen/Qwen3-VL-Embedding-2B --local-dir ./models/Qwen3-VL-Embedding-2B\n",
+        "\n",
+        "!hf download Qwen/Qwen3-VL-Embedding-2B --local-dir ./models/Qwen3-VL-Embedding-2B"
+      ],
+      "metadata": {
+        "id": "UkztmMRml5Bk"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import torch\n",
+        "from models.qwen3_vl_embedding import Qwen3VLEmbedder"
+      ],
+      "metadata": {
+        "id": "FBnR8j7_ifDh"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "model = Qwen3VLEmbedder(\n",
+        "    model_name_or_path=\"./models/Qwen3-VL-Embedding-2B\",\n",
+        "    # flash_attention_2 for better acceleration and memory saving\n",
+        "    # torch_dtype=torch.bfloat16,\n",
+        "    # attn_implementation=\"flash_attention_2\"\n",
+        ")"
+      ],
+      "metadata": {
+        "id": "jZoVu1lQll7m"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "inputs = [{\n",
+        "    \"text\": \"A woman playing with her dog on a beach at sunset.\",\n",
+        "    \"instruction\": \"Retrieve images or text relevant to the user's query.\",\n",
+        "}, {\n",
+        "    \"text\": \"A woman shares a joyful moment with her golden retriever on a sun-drenched beach at sunset, as the dog offers its paw in a heartwarming display of companionship and trust.\"\n",
+        "}, {\n",
+        "    \"image\": \"https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg\"\n",
+        "}, {\n",
+        "    \"text\": \"A woman shares a joyful moment with her golden retriever on a sun-drenched beach at sunset, as the dog offers its paw in a heartwarming display of companionship and trust.\",\n",
+        "    \"image\": \"https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg\"\n",
+        "}]"
+      ],
+      "metadata": {
+        "id": "rXklICoIm9_m"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "embeddings = model.process(inputs)"
+      ],
+      "metadata": {
+        "id": "IuBJLxUim_AF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(embeddings.shape)"
+      ],
+      "metadata": {
+        "id": "27zzE9r-s2hb"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(embeddings @ embeddings.T)"
+      ],
+      "metadata": {
+        "id": "Nab7x2jSnBNX"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
